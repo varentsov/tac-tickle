@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        tactickle.cpp
+        tactickle.cpp \
+    cell.cpp
 
-HEADERS  += tactickle.h
+HEADERS  += tactickle.h \
+    cell.h
 
 FORMS    += tactickle.ui
