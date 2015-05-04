@@ -19,6 +19,10 @@ TacTickle::~TacTickle()
     delete ui;
 }
 
+Cell* TacTickle::activeCell;
+
+Cell* TacTickle::cellsArray[4][5];
+
 void TacTickle::print_this() {
     QWidget *table = new QWidget(this);
     QPalette *black = new QPalette;
@@ -48,23 +52,64 @@ void TacTickle::print_this() {
 
 void TacTickle::print_table() {
     QBrush *white = new QBrush(Qt::white);
+    QBrush *red = new QBrush(Qt::red);
+    QBrush *blue = new QBrush(Qt::blue);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 5; j++) {
             if ((i+j) % 2 == 0) {
                 Cell *cell = new Cell(cage_size*i, cage_size*j, cage_size, white);
+                cell->x_cord = i;
+                cell->y_cord = j;
+                cellsArray[i][j] = cell;
                 scene->addItem(cell);
+                if (j == 0) {
+                    Figure *fig = new Figure(cage_size*i + 5, cage_size*j + 5, cage_size - 10, red, "Red");
+                    scene->addItem(fig);
+                    cell->figure = fig;
+                }
+                else if (j == 4) {
+                    Figure *fig = new Figure(cage_size*i + 5, cage_size*j + 5, cage_size - 10, blue, "Blue");
+                    scene->addItem(fig);
+                    cell->figure = fig;
+                }
             }
             else {
                 Cell *cell = new Cell(cage_size*i, cage_size*j, cage_size, white);
+                cell->x_cord = i;
+                cell->y_cord = j;
+                cellsArray[i][j] = cell;
                 scene->addItem(cell);
+                if (j == 0) {
+                    Figure *fig = new Figure(cage_size*i + 5, cage_size*j + 5, cage_size - 10, blue, "Blue");
+                    scene->addItem(fig);
+                    cell->figure = fig;
+                }
+                else if (j == 4) {
+                    Figure *fig = new Figure(cage_size*i + 5, cage_size*j + 5, cage_size - 10, red, "Red");
+                    scene->addItem(fig);
+                    cell->figure = fig;
+                }
             }
         }
     }
 }
 
+void TacTickle::printCellsAry() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 5; j++) {
+            qDebug() << cellsArray[i][j];
+        }
+    }
+}
+
+void TacTickle::gameOver()
+{
+    qDebug() << "GAME OVER!";
+}
+
 void TacTickle::paintEvent(QPaintEvent *) {
-    QPainter paint(this);
+    /*QPainter paint(this);
     paint.setPen(Qt::white);
     QBrush *brush = new QBrush;
     brush->setStyle(Qt::SolidPattern);
@@ -72,4 +117,5 @@ void TacTickle::paintEvent(QPaintEvent *) {
     paint.setBrush(*brush);
 
     //paint.drawEllipse(10, 10, 30, 30);
+    */
 }
