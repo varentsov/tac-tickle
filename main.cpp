@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     TacTickle w;
 
-    w.resize(500, 500);
-    w.print_table();
+    //w.resize(500, 500);
+    //w.print_table();
 
 
     w.show();

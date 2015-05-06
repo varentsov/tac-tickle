@@ -15,6 +15,8 @@ Cell::Cell(int start_x_pos, int start_y_pos, int size, QBrush *color)
     canMoveHere = false;
 }
 
+QString Cell::whoMove = "Blue";
+
 QRectF Cell::boundingRect() const
 {
     return QRectF(start_x_pos, start_y_pos, size, size);
@@ -40,8 +42,7 @@ void Cell::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     pressed = true;
     if (this->canMoveHere) {
-        moveFigure();
-        clearMovement();
+        moveFigure(this);
     }
     else {
         clearMovement();
@@ -52,7 +53,7 @@ void Cell::mousePressEvent(QGraphicsSceneMouseEvent *event)
 }
 
 void Cell::whereCanMove() {
-    if (this->figure) {
+    if (this->figure && this->figure->player == whoMove) {
         TacTickle::activeCell = this;
         for (int i = -1; i < 2; i = i + 1) {
             for (int j = -1; j < 2; j = j + 1) {
@@ -83,19 +84,21 @@ void Cell::clearMovement() {
     }
 }
 
-void Cell::moveFigure() {
-    if (this->canMoveHere) {
+void Cell::moveFigure(Cell *to_cell) {
+    if (to_cell->canMoveHere) {
         Cell *cell = TacTickle::activeCell;
-        if (this->x_cord < cell->x_cord)
+        if (to_cell->x_cord < cell->x_cord)
             moveFigureLeft();
-        else if (this->x_cord > cell->x_cord)
+        else if (to_cell->x_cord > cell->x_cord)
             moveFigureRight();
-        else if (this->y_cord > cell->y_cord)
+        else if (to_cell->y_cord > cell->y_cord)
             moveFigureDown();
         else
             moveFigureUp();
     }
-    isGameOver(this);
+    clearMovement();
+    changeWhoMove();
+    isGameOver(to_cell);
 }
 
 void Cell::moveFigureDown()
@@ -177,3 +180,30 @@ bool Cell::isWinner(Cell *cell)
     }
     return false;
 }
+
+void Cell::changeWhoMove()
+{
+    if (whoMove == "Blue")
+        whoMove = "Red";
+    else
+        whoMove = "Blue";
+
+    botMove();
+}
+
+void Cell::botMove()
+{
+    if (TacTickle::bot == whoMove) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (TacTickle::cellsArray[i][j]->figure && TacTickle::cellsArray[i][j]->figure->player == whoMove) {
+                    //TacTickle::cellsArray[i][j]->whereCanMove();
+                    //TacTickle::cellsArray[i][j]->moveFigure(TacTickle::cellsArray[i][j-1]);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+

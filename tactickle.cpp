@@ -7,11 +7,14 @@ TacTickle::TacTickle(QWidget *parent) :
     ui(new Ui::TacTickle)
 {
     ui->setupUi(this);
-    view = new QGraphicsView(this);
-    view->move(30, 30);
+    //view = new QGraphicsView(this);
+    //view->move(30, 30);
     //view->resize(300, 300);
+    view = ui->graphicsView;
     scene = new QGraphicsScene(view);
     view->setScene(scene);
+
+    printPureTable();
 }
 
 TacTickle::~TacTickle()
@@ -108,6 +111,37 @@ void TacTickle::gameOver()
     qDebug() << "GAME OVER!";
 }
 
+void TacTickle::resetGame()
+{
+    this->print_table();
+    Cell::whoMove = "Blue";
+    Cell::botMove();
+}
+
+void TacTickle::printPureTable()
+{
+    QBrush *white = new QBrush(Qt::white);
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 5; j++) {
+            if ((i+j) % 2 == 0) {
+                Cell *cell = new Cell(cage_size*i, cage_size*j, cage_size, white);
+                cell->x_cord = i;
+                cell->y_cord = j;
+                scene->addItem(cell);
+                cellsArray[i][j] = cell;
+            }
+            else {
+                Cell *cell = new Cell(cage_size*i, cage_size*j, cage_size, white);
+                cell->x_cord = i;
+                cell->y_cord = j;
+                scene->addItem(cell);
+                cellsArray[i][j] = cell;
+            }
+        }
+    }
+}
+
 void TacTickle::paintEvent(QPaintEvent *) {
     /*QPainter paint(this);
     paint.setPen(Qt::white);
@@ -118,4 +152,21 @@ void TacTickle::paintEvent(QPaintEvent *) {
 
     //paint.drawEllipse(10, 10, 30, 30);
     */
+}
+
+QString TacTickle::bot;
+
+void TacTickle::on_pushButton_2_clicked()
+{
+    scene->clear();
+    if (ui->radioButton_2->isChecked()) {
+        bot = "Blue";
+    }
+    else if (ui->radioButton_3->isChecked()) {
+        bot = "Red";
+    }
+    else {
+        bot = "";
+    }
+    resetGame();
 }

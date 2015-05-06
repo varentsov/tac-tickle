@@ -22,18 +22,21 @@ public:
     int x_cord;
     int y_cord;
     void isGameOver(Cell *cell);
+    static QString whoMove;
+    static void botMove();
 
 protected:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void whereCanMove();
     void clearMovement();
-    void moveFigure();
+    void moveFigure(Cell *to_cell);
     void moveFigureDown();
     void moveFigureUp();
     void moveFigureLeft();
     void moveFigureRight();
     bool isWinner(Cell *cell);
+    void changeWhoMove();
 
 private:
     int start_x_pos;

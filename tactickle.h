@@ -30,10 +30,17 @@ public:
     static Cell* cellsArray[4][5];
     static Cell *activeCell;
     static void gameOver();
+    static QString bot;
 
 
 protected:
 
+    void resetGame();
+    void printPureTable();
+
+
+private slots:
+    void on_pushButton_2_clicked();
 
 private:
     Ui::TacTickle *ui;
