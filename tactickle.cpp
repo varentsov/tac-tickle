@@ -106,9 +106,10 @@ void TacTickle::printCellsAry() {
     }
 }
 
-void TacTickle::gameOver()
+void TacTickle::gameOver(QString player)
 {
     qDebug() << "GAME OVER!";
+    //ui->graphicsView->setFocusPolicy(Qt::NoFocus);
 }
 
 void TacTickle::resetGame()

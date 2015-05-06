@@ -26,7 +26,6 @@ public:
     void botMove();
 
 protected:
-
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void whereCanMove();
     void clearMovement();
@@ -39,6 +38,7 @@ protected:
     void changeWhoMove();
     double miniMax(int recLevel, QString player);
     double heuristicAnalysis();
+    bool isGameOverBoard();
     QVector<QPoint> whereCanTempMove();
     void tempMoveFigure(Cell *to_cell);
 

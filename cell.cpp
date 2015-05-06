@@ -2,10 +2,10 @@
 #include <QDebug>
 #include "tactickle.h"
 #include <math.h>
-#include <time.h>
-#include <stdlib.h>
 
-#define MAX_REC_LEVEL 1
+#define MAX_SCORE 1000
+#define MIN_SCORE -1000
+#define MAX_REC_LEVEL 4
 
 
 Cell::Cell(int start_x_pos, int start_y_pos, int size, QBrush *color)
@@ -149,7 +149,7 @@ void Cell::isGameOver(Cell *cell)
 {
     if (isWinner(cell)) {
         qDebug() << "Winner is " << cell->figure->player;
-        TacTickle::gameOver();
+        TacTickle::gameOver(cell->figure->player);
     }
 }
 
@@ -185,6 +185,45 @@ bool Cell::isWinner(Cell *cell)
     return false;
 }
 
+bool Cell::isGameOverBoard()
+{
+    for (int k = 0; k < 4; k++) {
+        for (int g = 0; g < 5; g++) {
+            if (TacTickle::cellsArray[k][g]->figure) {
+                Cell *cell = TacTickle::cellsArray[k][g];
+                QString name = cell->figure->player;
+                for (int i = -1; i < 2; i++) {
+                    for (int j = -1; j < 2; j++) {
+                        if ((cell->x_cord + i < 0) || (cell->x_cord + i >= 4) || (cell->y_cord + j < 0) || (cell->y_cord + j >= 5) || ((i == j) && (i == 0)))
+                            continue;
+                        else {
+                            Cell *next_cell = TacTickle::cellsArray[cell->x_cord + i][cell->y_cord + j];
+                            if (next_cell->figure && next_cell->figure->player == name) {
+                                if ((next_cell->x_cord + i < 0) || (next_cell->x_cord + i >= 4) || (next_cell->y_cord + j < 0) || (next_cell->y_cord + j >= 5)) {
+                                }
+                                else {
+                                    Cell *next_next_cell = TacTickle::cellsArray[next_cell->x_cord + i][next_cell->y_cord + j];
+                                    if (next_next_cell->figure && next_next_cell->figure->player == name)
+                                        return true;
+                                }
+                                if ((cell->x_cord - i < 0) || (cell->x_cord - i >= 4) || (cell->y_cord - j < 0) || (cell->y_cord - j >= 5)) {
+                                }
+                                else {
+                                    Cell *next_next_cell = TacTickle::cellsArray[cell->x_cord - i][cell->y_cord - j];
+                                    if (next_next_cell->figure && next_next_cell->figure->player == name)
+                                        return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 void Cell::changeWhoMove()
 {
     if (whoMove == "Blue")
@@ -193,44 +232,6 @@ void Cell::changeWhoMove()
         whoMove = "Blue";
 
     botMove();
-}
-
-double Cell::heuristicAnalysis()
-{
-
-    QVector<QPoint> points;
-    double minAreaForWin = 1000;
-    double tempArea, a, b, c, per;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 5; j++) {
-            if (TacTickle::cellsArray[i][j]->figure && TacTickle::cellsArray[i][j]->figure->player == TacTickle::bot) {
-                points.append(QPoint(i, j));
-            }
-        }
-    }
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (i == j)
-                continue;
-            for (int k = 0; k < 4; k++) {
-                if (k == j || k == i)
-                    continue;
-                a = sqrt(pow(points[i].x() - points[j].x(), 2) + pow(points[i].y() - points[j].y(), 2));
-                b = sqrt(pow(points[i].x() - points[k].x(), 2) + pow(points[i].y() - points[k].y(), 2));
-                c = sqrt(pow(points[k].x() - points[j].x(), 2) + pow(points[k].y() - points[j].y(), 2));
-                per = (a + b + c)/2;
-                tempArea = sqrt(per*(per - a)*(per - b)*(per - c));
-                if (tempArea < minAreaForWin)
-                    minAreaForWin = tempArea;
-            }
-        }
-    }
-
-    //return minAreaForWin;
-
-    return rand()%100;
 }
 
 QVector<QPoint> Cell::whereCanTempMove()
@@ -266,8 +267,6 @@ void Cell::tempMoveFigure(Cell *to_cell)
         moveFigureDown();
     else
         moveFigureUp();
-
-    //changeWhoMove();
 }
 
 void Cell::botMove()
@@ -280,26 +279,34 @@ void Cell::botMove()
 
 double Cell::miniMax(int recLevel, QString player)
 {
+    if (isGameOverBoard() && player == TacTickle::bot) {
+        return MIN_SCORE;
+    }
+    else if (isGameOverBoard() && player != TacTickle::bot) {
+        return MAX_SCORE;
+    }
+
     if (recLevel >= MAX_REC_LEVEL) {
         return heuristicAnalysis();
     }
 
     int from_x, from_y, to_x, to_y;
 
-    double score = 1000, temp;
+    double score, temp;
+
+    score = (player == TacTickle::bot) ? MIN_SCORE - 1 : MAX_SCORE + 1;
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 5; j++) {
             if (TacTickle::cellsArray[i][j]->figure && TacTickle::cellsArray[i][j]->figure->player == player) {
                 QVector<QPoint> points = TacTickle::cellsArray[i][j]->whereCanTempMove();
-                //TacTickle::cellsArray[i][j]->moveFigure(TacTickle::cellsArray[i][j-1]);
                 for (int p = 0; p < points.size(); p++) {
                     TacTickle::activeCell = TacTickle::cellsArray[i][j];
                     TacTickle::cellsArray[i][j]->tempMoveFigure(TacTickle::cellsArray[points[p].x()][points[p].y()]);
 
                     temp = miniMax(recLevel + 1, (player == "Red") ? "Blue" : "Red");
 
-                    if (temp < score) {
+                    if ((score < temp && player == TacTickle::bot) || (score > temp && player == (TacTickle::bot == "Red" ? "Blue" : "Red"))) {
                         score = temp;
                         from_x = i;
                         from_y = j;
@@ -307,13 +314,15 @@ double Cell::miniMax(int recLevel, QString player)
                         to_y = points[p].y();
                     }
 
-                    qDebug() << temp;
-
                     TacTickle::activeCell = TacTickle::cellsArray[points[p].x()][points[p].y()];
                     TacTickle::cellsArray[points[p].x()][points[p].y()]->tempMoveFigure(TacTickle::cellsArray[i][j]);
                 }
             }
         }
+    }
+
+    if (score > 1000 || score < -1000) {
+        return heuristicAnalysis();
     }
 
     if (recLevel == 0) {
@@ -323,5 +332,45 @@ double Cell::miniMax(int recLevel, QString player)
 
     return score;
 }
+
+double Cell::heuristicAnalysis()
+{
+
+    QVector<QPoint> points;
+    double minAreaForWin = 1000;
+    double tempArea, a, b, c, per, min;
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (TacTickle::cellsArray[i][j]->figure && TacTickle::cellsArray[i][j]->figure->player == TacTickle::bot) {
+                points.append(QPoint(i, j));
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (i == j)
+                continue;
+            for (int k = 0; k < 4; k++) {
+                if (k == j || k == i)
+                    continue;
+                a = sqrt(pow(points[i].x() - points[j].x(), 2) + pow(points[i].y() - points[j].y(), 2));
+                b = sqrt(pow(points[i].x() - points[k].x(), 2) + pow(points[i].y() - points[k].y(), 2));
+                c = sqrt(pow(points[k].x() - points[j].x(), 2) + pow(points[k].y() - points[j].y(), 2));
+                per = (a + b + c)/2;
+                min = a <= b ? a : b;
+                min = min < c ? min : c;
+                tempArea = sqrt(per*(per - a)*(per - b)*(per - c));
+                if (tempArea < minAreaForWin)
+                    minAreaForWin = tempArea + c;
+            }
+        }
+    }
+
+    return 1.0/minAreaForWin;
+}
+
+
 
 
