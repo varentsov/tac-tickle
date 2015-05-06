@@ -115,7 +115,7 @@ void TacTickle::resetGame()
 {
     this->print_table();
     Cell::whoMove = "Blue";
-    Cell::botMove();
+    cellsArray[0][0]->botMove();
 }
 
 void TacTickle::printPureTable()

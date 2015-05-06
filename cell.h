@@ -23,7 +23,7 @@ public:
     int y_cord;
     void isGameOver(Cell *cell);
     static QString whoMove;
-    static void botMove();
+    void botMove();
 
 protected:
 
@@ -37,6 +37,10 @@ protected:
     void moveFigureRight();
     bool isWinner(Cell *cell);
     void changeWhoMove();
+    double miniMax(int recLevel, QString player);
+    double heuristicAnalysis();
+    QVector<QPoint> whereCanTempMove();
+    void tempMoveFigure(Cell *to_cell);
 
 private:
     int start_x_pos;
