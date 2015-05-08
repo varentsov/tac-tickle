@@ -13,6 +13,7 @@ TacTickle::TacTickle(QWidget *parent) :
     view = ui->graphicsView;
     scene = new QGraphicsScene(view);
     view->setScene(scene);
+    game = this;
 
     printPureTable();
 }
@@ -21,6 +22,8 @@ TacTickle::~TacTickle()
 {
     delete ui;
 }
+
+TacTickle* TacTickle::game;
 
 Cell* TacTickle::activeCell;
 
@@ -109,13 +112,15 @@ void TacTickle::printCellsAry() {
 void TacTickle::gameOver(QString player)
 {
     qDebug() << "GAME OVER!";
-    //ui->graphicsView->setFocusPolicy(Qt::NoFocus);
+    ui->graphicsView->setInteractive(false);
 }
 
 void TacTickle::resetGame()
 {
     this->print_table();
+    ui->graphicsView->setInteractive(true);
     Cell::whoMove = "Blue";
+    aiLevel = ui->spinBox->value();
     cellsArray[0][0]->botMove();
 }
 

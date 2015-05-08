@@ -29,15 +29,15 @@ public:
     static const int start_y_pos = 30;
     static Cell* cellsArray[4][5];
     static Cell *activeCell;
-    static void gameOver(QString player);
+    void gameOver(QString player);
     static QString bot;
-
+    static TacTickle *game;
+    int aiLevel;
 
 protected:
-
     void resetGame();
     void printPureTable();
-
+    void backMove();
 
 private slots:
     void on_pushButton_2_clicked();

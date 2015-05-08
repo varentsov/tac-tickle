@@ -5,7 +5,6 @@
 
 #define MAX_SCORE 1000
 #define MIN_SCORE -1000
-#define MAX_REC_LEVEL 4
 
 
 Cell::Cell(int start_x_pos, int start_y_pos, int size, QBrush *color)
@@ -149,7 +148,7 @@ void Cell::isGameOver(Cell *cell)
 {
     if (isWinner(cell)) {
         qDebug() << "Winner is " << cell->figure->player;
-        TacTickle::gameOver(cell->figure->player);
+        TacTickle::game->gameOver(cell->figure->player);
     }
 }
 
@@ -280,13 +279,13 @@ void Cell::botMove()
 double Cell::miniMax(int recLevel, QString player)
 {
     if (isGameOverBoard() && player == TacTickle::bot) {
-        return MIN_SCORE;
+        return MIN_SCORE - recLevel;
     }
     else if (isGameOverBoard() && player != TacTickle::bot) {
-        return MAX_SCORE;
+        return MAX_SCORE - recLevel;
     }
 
-    if (recLevel >= MAX_REC_LEVEL) {
+    if (recLevel >= TacTickle::game->aiLevel) {
         return heuristicAnalysis();
     }
 
@@ -321,7 +320,7 @@ double Cell::miniMax(int recLevel, QString player)
         }
     }
 
-    if (score > 1000 || score < -1000) {
+    if (score > 2*MAX_SCORE || score < 2*MIN_SCORE) {
         return heuristicAnalysis();
     }
 
@@ -335,7 +334,6 @@ double Cell::miniMax(int recLevel, QString player)
 
 double Cell::heuristicAnalysis()
 {
-
     QVector<QPoint> points;
     double minAreaForWin = 1000;
     double tempArea, a, b, c, per, min;
