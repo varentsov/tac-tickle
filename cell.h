@@ -5,6 +5,7 @@
 #include <QPainter>
 #include "figure.h"
 #include <QVector>
+#include "movies.h"
 
 class Cell :public QGraphicsItem
 {
@@ -24,12 +25,12 @@ public:
     void isGameOver(Cell *cell);
     static QString whoMove;
     void botMove();
+    void moveFigure(Cell *to_cell, bool backMove = false);
+    void whereCanMove();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void whereCanMove();
     void clearMovement();
-    void moveFigure(Cell *to_cell);
     void moveFigureDown();
     void moveFigureUp();
     void moveFigureLeft();
@@ -41,6 +42,7 @@ protected:
     bool isGameOverBoard();
     QVector<QPoint> whereCanTempMove();
     void tempMoveFigure(Cell *to_cell);
+    void addMove(Cell *from_cell, Cell *to_cell);
 
 private:
     int start_x_pos;

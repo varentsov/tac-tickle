@@ -8,6 +8,10 @@
 #include <QDebug>
 #include "cell.h"
 #include "figure.h"
+#include "movies.h"
+#include <QStack>
+#include <QMessageBox>
+
 
 namespace Ui {
 class TacTickle;
@@ -21,7 +25,6 @@ public:
     explicit TacTickle(QWidget *parent = 0);
     ~TacTickle();
     void print_table();
-    void paintEvent(QPaintEvent *);
     void print_this();
     void printCellsAry();
     static const int cage_size = 80;
@@ -33,6 +36,7 @@ public:
     static QString bot;
     static TacTickle *game;
     int aiLevel;
+    static QStack<Movies*> moves;
 
 protected:
     void resetGame();
@@ -41,6 +45,8 @@ protected:
 
 private slots:
     void on_pushButton_2_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::TacTickle *ui;

@@ -19,6 +19,7 @@ SOURCES += main.cpp\
 
 HEADERS  += tactickle.h \
     cell.h \
-    figure.h
+    figure.h \
+    movies.h
 
 FORMS    += tactickle.ui

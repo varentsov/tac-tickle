@@ -87,7 +87,20 @@ void Cell::clearMovement() {
     }
 }
 
-void Cell::moveFigure(Cell *to_cell) {
+
+void Cell::addMove(Cell *from_cell, Cell *to_cell)
+{
+    Movies *move = new Movies;
+    move->from_x = from_cell->x_cord;
+    move->from_y = from_cell->y_cord;
+    move->to_x = to_cell->x_cord;
+    move->to_y = to_cell->y_cord;
+
+    TacTickle::moves.push(move);
+}
+
+
+void Cell::moveFigure(Cell *to_cell, bool backMove) {
     if (to_cell->canMoveHere) {
         Cell *cell = TacTickle::activeCell;
         if (to_cell->x_cord < cell->x_cord)
@@ -99,9 +112,14 @@ void Cell::moveFigure(Cell *to_cell) {
         else
             moveFigureUp();
     }
-    clearMovement();
-    isGameOver(to_cell);
-    changeWhoMove();
+    if (!backMove) {
+        addMove(TacTickle::activeCell, to_cell);
+        clearMovement();
+        isGameOver(to_cell);
+        changeWhoMove();
+    }
+    else
+        clearMovement();
 }
 
 void Cell::moveFigureDown()
@@ -256,7 +274,6 @@ QVector<QPoint> Cell::whereCanTempMove()
 
 void Cell::tempMoveFigure(Cell *to_cell)
 {
-
     Cell *cell = TacTickle::activeCell;
     if (to_cell->x_cord < cell->x_cord)
         moveFigureLeft();
@@ -279,7 +296,7 @@ void Cell::botMove()
 double Cell::miniMax(int recLevel, QString player)
 {
     if (isGameOverBoard() && player == TacTickle::bot) {
-        return MIN_SCORE - recLevel;
+        return MIN_SCORE + recLevel;
     }
     else if (isGameOverBoard() && player != TacTickle::bot) {
         return MAX_SCORE - recLevel;
@@ -289,7 +306,7 @@ double Cell::miniMax(int recLevel, QString player)
         return heuristicAnalysis();
     }
 
-    int from_x, from_y, to_x, to_y;
+    int from_x = MIN_SCORE, from_y = MIN_SCORE, to_x = MIN_SCORE, to_y = MIN_SCORE;
 
     double score, temp;
 
@@ -318,10 +335,6 @@ double Cell::miniMax(int recLevel, QString player)
                 }
             }
         }
-    }
-
-    if (score > 2*MAX_SCORE || score < 2*MIN_SCORE) {
-        return heuristicAnalysis();
     }
 
     if (recLevel == 0) {

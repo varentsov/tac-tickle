@@ -7,14 +7,11 @@ TacTickle::TacTickle(QWidget *parent) :
     ui(new Ui::TacTickle)
 {
     ui->setupUi(this);
-    //view = new QGraphicsView(this);
-    //view->move(30, 30);
-    //view->resize(300, 300);
     view = ui->graphicsView;
     scene = new QGraphicsScene(view);
     view->setScene(scene);
     game = this;
-
+    this->setFixedSize(this->width()+70, this->height()+100);
     printPureTable();
 }
 
@@ -111,8 +108,13 @@ void TacTickle::printCellsAry() {
 
 void TacTickle::gameOver(QString player)
 {
-    qDebug() << "GAME OVER!";
     ui->graphicsView->setInteractive(false);
+    QString str = QString("Gameis over and winner is %1").arg(player);
+    QMessageBox msg;
+    msg.addButton(QMessageBox::Ok);
+    msg.setText(str);
+
+    msg.exec();
 }
 
 void TacTickle::resetGame()
@@ -148,19 +150,40 @@ void TacTickle::printPureTable()
     }
 }
 
-void TacTickle::paintEvent(QPaintEvent *) {
-    /*QPainter paint(this);
-    paint.setPen(Qt::white);
-    QBrush *brush = new QBrush;
-    brush->setStyle(Qt::SolidPattern);
-    brush->setColor(Qt::blue);
-    paint.setBrush(*brush);
+void TacTickle::backMove()
+{
+    if (moves.isEmpty())
+        return;
+    else if (bot == "Blue" && moves.size() == 1)
+        return;
 
-    //paint.drawEllipse(10, 10, 30, 30);
-    */
+    if (bot != "") {
+        for (int i = 0; i < 2; i++) {
+            if (moves.isEmpty())
+                break;
+
+            Movies *move = moves.pop();
+            Cell::whoMove = TacTickle::cellsArray[move->to_x][move->to_y]->figure->player;
+            TacTickle::cellsArray[move->to_x][move->to_y]->whereCanMove();
+            TacTickle::cellsArray[move->to_x][move->to_y]->moveFigure(TacTickle::cellsArray[move->from_x][move->from_y], true);
+            delete move;
+        }
+    }
+    else {
+        Movies *move = moves.pop();
+        Cell::whoMove = TacTickle::cellsArray[move->to_x][move->to_y]->figure->player;
+        TacTickle::cellsArray[move->to_x][move->to_y]->whereCanMove();
+        TacTickle::cellsArray[move->to_x][move->to_y]->moveFigure(TacTickle::cellsArray[move->from_x][move->from_y], true);
+        delete move;
+        Cell::whoMove = (Cell::whoMove == "Red") ? "Blue" : "Red";
+    }
+    if (!ui->graphicsView->isInteractive())
+        ui->graphicsView->setInteractive(true);
 }
 
-QString TacTickle::bot;
+QString TacTickle::bot = "";
+
+QStack<Movies*> TacTickle::moves;
 
 void TacTickle::on_pushButton_2_clicked()
 {
@@ -175,4 +198,9 @@ void TacTickle::on_pushButton_2_clicked()
         bot = "";
     }
     resetGame();
+}
+
+void TacTickle::on_pushButton_clicked()
+{
+    backMove();
 }
