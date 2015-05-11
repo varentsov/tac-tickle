@@ -5,7 +5,6 @@
 #include <QPainter>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <QDebug>
 #include "cell.h"
 #include "figure.h"
 #include "movies.h"
@@ -26,7 +25,6 @@ public:
     ~TacTickle();
     void print_table();
     void print_this();
-    void printCellsAry();
     static const int cage_size = 80;
     static const int start_x_pos = 30;
     static const int start_y_pos = 30;

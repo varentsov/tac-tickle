@@ -37,7 +37,7 @@ protected:
     void moveFigureRight();
     bool isWinner(Cell *cell);
     void changeWhoMove();
-    double miniMax(int recLevel, QString player);
+    double miniMax(int recLevel, QString player, double alpha, double beta);
     double heuristicAnalysis();
     bool isGameOverBoard();
     QVector<QPoint> whereCanTempMove();

@@ -98,14 +98,6 @@ void TacTickle::print_table() {
     }
 }
 
-void TacTickle::printCellsAry() {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 5; j++) {
-            qDebug() << cellsArray[i][j];
-        }
-    }
-}
-
 void TacTickle::gameOver(QString player)
 {
     ui->graphicsView->setInteractive(false);
