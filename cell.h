@@ -6,6 +6,7 @@
 #include "figure.h"
 #include <QVector>
 #include "movies.h"
+#include <QtConcurrent>
 
 class Cell :public QGraphicsItem
 {

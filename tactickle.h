@@ -35,6 +35,8 @@ public:
     static TacTickle *game;
     int aiLevel;
     static QStack<Movies*> moves;
+    void closeEvents();
+    void openEvents();
 
 protected:
     void resetGame();

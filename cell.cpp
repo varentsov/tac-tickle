@@ -239,16 +239,6 @@ bool Cell::isGameOverBoard()
     return false;
 }
 
-void Cell::changeWhoMove()
-{
-    if (whoMove == "Blue")
-        whoMove = "Red";
-    else
-        whoMove = "Blue";
-
-    botMove();
-}
-
 QVector<QPoint> Cell::whereCanTempMove()
 {
     QVector<QPoint> points;
@@ -273,23 +263,56 @@ QVector<QPoint> Cell::whereCanTempMove()
 void Cell::tempMoveFigure(Cell *to_cell)
 {
     Cell *cell = TacTickle::activeCell;
-    if (to_cell->x_cord < cell->x_cord)
-        moveFigureLeft();
-    else if (to_cell->x_cord > cell->x_cord)
-        moveFigureRight();
-    else if (to_cell->y_cord > cell->y_cord)
-        moveFigureDown();
+    if (to_cell->x_cord < cell->x_cord) {
+        Cell *cell = TacTickle::activeCell;
+        Figure *fig = cell->figure;
+        Cell *to_cell = TacTickle::cellsArray[cell->x_cord - 1][cell->y_cord];
+        cell->figure = NULL;
+        to_cell->figure = fig;
+    }
+    else if (to_cell->x_cord > cell->x_cord) {
+        Cell *cell = TacTickle::activeCell;
+        Figure *fig = cell->figure;
+        Cell *to_cell = TacTickle::cellsArray[cell->x_cord + 1][cell->y_cord];
+        cell->figure = NULL;
+        to_cell->figure = fig;
+    }
+    else if (to_cell->y_cord > cell->y_cord) {
+        Cell *cell = TacTickle::activeCell;
+        Figure *fig = cell->figure;
+        Cell *to_cell = TacTickle::cellsArray[cell->x_cord][cell->y_cord + 1];
+        cell->figure = NULL;
+        to_cell->figure = fig;
+        to_cell->update();
+    }
+    else {
+        Cell *cell = TacTickle::activeCell;
+        Figure *fig = cell->figure;
+        Cell *to_cell = TacTickle::cellsArray[cell->x_cord][cell->y_cord - 1];
+        cell->figure = NULL;
+        to_cell->figure = fig;
+    }
+}
+
+void Cell::changeWhoMove()
+{
+    if (whoMove == "Blue")
+        whoMove = "Red";
     else
-        moveFigureUp();
+        whoMove = "Blue";
+
+    botMove();
 }
 
 void Cell::botMove()
 {
     if (TacTickle::bot == whoMove) {
-        miniMax(0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
+        //miniMax(0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
+        TacTickle::game->closeEvents();
+        QFuture<void> minmax = QtConcurrent::run(this, &Cell::miniMax, 0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
+        //minmax.waitForFinished();
     }
 }
-
 
 double Cell::miniMax(int recLevel, QString player, double alpha, double beta)
 {
@@ -344,7 +367,9 @@ double Cell::miniMax(int recLevel, QString player, double alpha, double beta)
 
     if (recLevel == 0) {
         TacTickle::cellsArray[from_x][from_y]->whereCanMove();
+        TacTickle::game->openEvents();
         TacTickle::cellsArray[from_x][from_y]->moveFigure(TacTickle::cellsArray[to_x][to_y]);
+        TacTickle::cellsArray[from_x][from_y]->update(); // for concurrent running
     }
 
     return score;

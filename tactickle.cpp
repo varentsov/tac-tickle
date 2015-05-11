@@ -109,6 +109,16 @@ void TacTickle::gameOver(QString player)
     msg.exec();
 }
 
+void TacTickle::closeEvents()
+{
+    ui->graphicsView->setInteractive(false);
+}
+
+void TacTickle::openEvents()
+{
+    ui->graphicsView->setInteractive(true);
+}
+
 void TacTickle::resetGame()
 {
     this->print_table();
