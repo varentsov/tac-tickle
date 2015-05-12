@@ -10,6 +10,7 @@
 #include "movies.h"
 #include <QStack>
 #include <QMessageBox>
+#include <QDebug>
 
 
 namespace Ui {
@@ -37,6 +38,9 @@ public:
     static QStack<Movies*> moves;
     void closeEvents();
     void openEvents();
+
+public slots:
+    void concurrentBotMove();
 
 protected:
     void resetGame();

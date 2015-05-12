@@ -7,6 +7,8 @@
 #include <QVector>
 #include "movies.h"
 #include <QtConcurrent>
+#include <QFutureWatcher>
+#include <QFuture>
 
 class Cell :public QGraphicsItem
 {
@@ -28,6 +30,7 @@ public:
     void botMove();
     void moveFigure(Cell *to_cell, bool backMove = false);
     void whereCanMove();
+    static Movies tempBotMove;
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -44,6 +47,7 @@ protected:
     QVector<QPoint> whereCanTempMove();
     void tempMoveFigure(Cell *to_cell);
     void addMove(Cell *from_cell, Cell *to_cell);
+    QFutureWatcher<double> watcher;
 
 private:
     int start_x_pos;

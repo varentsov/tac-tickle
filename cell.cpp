@@ -309,8 +309,11 @@ void Cell::botMove()
     if (TacTickle::bot == whoMove) {
         //miniMax(0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
         TacTickle::game->closeEvents();
-        QFuture<void> minmax = QtConcurrent::run(this, &Cell::miniMax, 0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
-        //minmax.waitForFinished();
+
+        TacTickle::game->connect(&watcher, SIGNAL(finished()), TacTickle::game, SLOT(concurrentBotMove()));
+        QFuture<double> minmax;
+        minmax = QtConcurrent::run(this, &Cell::miniMax, 0, TacTickle::bot, 10*MIN_SCORE, 10*MAX_SCORE);
+        watcher.setFuture(minmax);
     }
 }
 
@@ -366,14 +369,20 @@ double Cell::miniMax(int recLevel, QString player, double alpha, double beta)
     }
 
     if (recLevel == 0) {
-        TacTickle::cellsArray[from_x][from_y]->whereCanMove();
+        //TacTickle::cellsArray[from_x][from_y]->whereCanMove();
         TacTickle::game->openEvents();
-        TacTickle::cellsArray[from_x][from_y]->moveFigure(TacTickle::cellsArray[to_x][to_y]);
-        TacTickle::cellsArray[from_x][from_y]->update(); // for concurrent running
+        //TacTickle::cellsArray[from_x][from_y]->moveFigure(TacTickle::cellsArray[to_x][to_y]);
+        //TacTickle::cellsArray[from_x][from_y]->update(); // for concurrent running
+        tempBotMove.from_x = from_x;
+        tempBotMove.from_y = from_y;
+        tempBotMove.to_x = to_x;
+        tempBotMove.to_y = to_y;
     }
 
     return score;
 }
+
+Movies Cell::tempBotMove;
 
 double Cell::heuristicAnalysis()
 {
@@ -411,7 +420,3 @@ double Cell::heuristicAnalysis()
 
     return 1.0/minAreaForWin;
 }
-
-
-
-

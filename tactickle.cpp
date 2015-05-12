@@ -206,3 +206,11 @@ void TacTickle::on_pushButton_clicked()
 {
     backMove();
 }
+
+void TacTickle::concurrentBotMove()
+{
+    qDebug() << Cell::tempBotMove.from_x << Cell::tempBotMove.from_y << Cell::tempBotMove.to_x << Cell::tempBotMove.to_y;
+    cellsArray[Cell::tempBotMove.from_x][Cell::tempBotMove.from_y]->whereCanMove();
+    cellsArray[Cell::tempBotMove.from_x][Cell::tempBotMove.from_y]->moveFigure(cellsArray[Cell::tempBotMove.to_x][Cell::tempBotMove.to_y]);
+}
+
